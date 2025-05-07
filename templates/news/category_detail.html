@@ -1,0 +1,24 @@
+{% extends 'default.html' %}
+
+{% block content %}
+    <h2>{{ category.name }}</h2>
+<div class="subscription-section mb-3">
+    {% if user.is_authenticated %}
+    <button onclick="subscribe({{ category.id }})"
+            id="subscribeBtn"
+            class="btn btn-sm {% if user in category.subscribers.all %}btn-danger{% else %}btn-success{% endif %}">
+        {% if user in category.subscribers.all %}Отписаться{% else %}Подписаться{% endif %}
+    </button>
+    {% else %}
+    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-sm btn-secondary">Войдите, чтобы подписаться</a>
+    {% endif %}
+</div>
+
+<!-- Остальной контент (список новостей и т.д.) -->
+<ul>
+    {% for post in category.post_set.all %}
+    <li>{{ post.title }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}

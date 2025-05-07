@@ -1,0 +1,60 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+   <h1>Все новости</h1>
+    <p><h3>Всего новостей: {{ posts|length }}</h3></p>
+   <hr>
+   <h3>{{ time_now|date:'d M Y' }}</h3>
+
+   <h3> {{next_post|default_if_none:"Чуть позже будут новости!" }} </h3>
+   <hr>
+   {%if category_news_list%}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Текст</td>
+               <td>Категория</td>
+           </tr>
+       {% for post in category_news_list %}
+           <tr>
+               <td>{{ Post.title|censor_text }}</td>
+               <td>{{ Post.created_at|date:'d M y' }}</td>
+               <td>{{ Post.text|censor_text|truncatechars:20 }}</td>
+               <td>
+                    {% for category in post.categories.all %}
+                        <a href="{% url 'news:category_list' category.id %}">{{category.name}}</a>
+                        <a href="{% url 'news:subscribe' category.id %}" class="btn-secondary btn-sn">Подписаться</a></p>
+                    {% endfor %}
+               </td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+{% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}

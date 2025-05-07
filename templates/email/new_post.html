@@ -1,0 +1,9 @@
+{# templates/email/new_post.html #}
+<p>Уважаемый {{ user.username }},</p>
+
+<p>В категории "{{ category.name }}" вышла новая статья: <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+
+<p>{{ post.text|truncatechars:50 }}</p>
+
+<p>С уважением,<br>
+Команда NewsPortal</p>
