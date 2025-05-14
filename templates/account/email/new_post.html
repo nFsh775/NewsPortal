@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Новая статья в категории {{ category.name }}</title>
+</head>
+<body>
+    <p>Уважаемый {{ user.username }},</p>
+
+    <p>В категории "<strong>{{ category.name }}</strong>" вышла новая статья:</p>
+
+    <h3><a href="http://{{ domain }}{% url 'news:post_detail' pk=post.id %}">
+        {{ post.title }}
+    </a></h3>
+
+    <p>{{ post.text|truncatechars:150 }}</p>
+
+    <p>Читать полностью:
+       <a href="http://{{ domain }}{% url 'news:post_detail' pk=post.id %}">
+           http://{{ domain }}{% url 'news:post_detail' pk=post.id %}
+       </a>
+    </p>
+
+    <p>С уважением,<br>
+    Команда {{ domain }}</p>
+</body>
+</html>

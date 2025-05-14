@@ -1,0 +1,32 @@
+{% extends 'default.html' %}
+
+{% block content %}
+<h1>{{ category.name }}</h1>
+
+{% if user.is_authenticated %}
+    <form action="{% url 'news:subscribe' category_id=category.id %}" method="post">
+        {% csrf_token %}
+        {% if is_subscribed %}
+            <button type="submit" class="btn btn-danger">Отписаться</button>
+            <p>Вы подписаны на эту категорию. Новые статьи будут приходить вам на email.</p>
+        {% else %}
+            <button type="submit" class="btn btn-success">Подписаться</button>
+            <p>Подписаться на эту категорию, чтобы получать новые статьи на email.</p>
+        {% endif %}
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы подписаться на эту категорию.</p>
+{% endif %}
+
+<h2>Последние статьи:</h2>
+<ul>
+    {% for post in category.posts.all|slice:":5" %}
+        <li>
+            <a href="{% url 'news:category_detail' pk=category.id %}">{{ post.title }}</a>
+            <small>{{ post.created_at|date:"d.m.Y" }}</small>
+        </li>
+    {% empty %}
+        <li>Пока нет статей в этой категории</li>
+    {% endfor %}
+</ul>
+{% endblock %}
