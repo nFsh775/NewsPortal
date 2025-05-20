@@ -23,7 +23,7 @@ def send_notifications_to_subscribers(post):
                 try:
                     subject = f'Новая новость в категории {category.name}: {post.title}'
                     html_content = render_to_string(
-                        'email/new_post.html',
+                        'account/email/new_post.html',
                         {
                             'post': post,
                             'user': user,
