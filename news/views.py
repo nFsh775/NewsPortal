@@ -10,11 +10,9 @@ from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from django.contrib.sites.models import Site
+
 
 class PostsList(ListView):
     model = Post
@@ -61,37 +59,37 @@ class PostCreate(PermissionRequiredMixin,CreateView):
         post.save()  # Сохраняем пост после установки типа
         form.save_m2m()
 
-        if post.post_type == 'NW':
-            # Получаем всех подписчиков всех категорий поста
-            domain = Site.objects.get_current().domain
-            subscribers_sent = set()  # Для избежания дублирования
-
-            for category in post.categories.all():
-                for user in category.subscribers.all():
-                    if user.email and user not in subscribers_sent:
-                        try:
-                            subject = f'Новая новость в категории {category.name}: {post.title}'
-                            html_content = render_to_string(  # Определяем переменную здесь
-                                'email/new_post.html',
-                                {
-                                    'post': post,
-                                    'user': user,
-                                    'domain': domain,
-                                    'category': category
-                                }
-                            )
-
-                            send_mail(
-                                subject=subject,
-                                message='',  # Текстовый вариант
-                                from_email='fshhh-11@yandex.ru',
-                                recipient_list=[user.email],
-                                html_message=html_content,
-                                fail_silently=True,
-                            )
-                            subscribers_sent.add(user)
-                        except Exception as e:
-                            print(f"Ошибка отправки письма: {e}")
+        # if post.post_type == 'NW':
+        #     # Получаем всех подписчиков всех категорий поста
+        #     domain = Site.objects.get_current().domain
+        #     subscribers_sent = set()  # Для избежания дублирования
+        #
+        #     for category in post.categories.all():
+        #         for user in category.subscribers.all():
+        #             if user.email and user not in subscribers_sent:
+        #                 try:
+        #                     subject = f'Новая новость в категории {category.name}: {post.title}'
+        #                     html_content = render_to_string(  # Определяем переменную здесь
+        #                         'account/email/new_post.html',
+        #                         {
+        #                             'post': post,
+        #                             'user': user,
+        #                             'domain': domain,
+        #                             'category': category
+        #                         }
+        #                     )
+        #
+        #                     send_mail(
+        #                         subject=subject,
+        #                         message='',  # Текстовый вариант
+        #                         from_email='fshhh-11@yandex.ru',
+        #                         recipient_list=[user.email],
+        #                         html_message=html_content,
+        #                         fail_silently=True,
+        #                     )
+        #                     subscribers_sent.add(user)
+        #                 except Exception as e:
+        #                     print(f"Ошибка отправки письма: {e}")
 
         return super().form_valid(form)
 
@@ -124,7 +122,7 @@ class PostUpdate(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
 
     def form_valid(self, form):
         post = form.save()
-        return redirect('news')
+        return redirect('news:posts_list')
 
 class PostDelete(DeleteView):
     model = Post

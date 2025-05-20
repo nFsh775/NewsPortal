@@ -1,16 +1,16 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
-from .models import Post
+from .models import Post,PostCategory
 from django.utils import timezone
 from datetime import timedelta
 
 
-@receiver(post_save, sender=Post)
-def handle_post_save(sender, instance, created, **kwargs):
-    if created and instance.post_type == 'NW':
+@receiver(m2m_changed, sender=PostCategory)
+def handle_post_save(sender, instance, action, **kwargs):
+    if action and instance.post_type == 'NW':
         send_notifications_to_subscribers(instance)
 
 def send_notifications_to_subscribers(post):
@@ -45,7 +45,7 @@ def send_notifications_to_subscribers(post):
                     print(f"Ошибка отправки письма: {e}")
 
 
-@receiver(post_save, sender=Post)
+@receiver(m2m_changed, sender=Post)
 def check_news_limit(sender, instance, **kwargs):
     if instance.pk is None and instance.post_type == 'NW':
         twenty_four_hours_ago = timezone.now() - timedelta(hours=24)
